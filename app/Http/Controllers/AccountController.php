@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Support\Facades\File;
+
 
 class AccountController extends Controller
 {
@@ -144,8 +146,9 @@ class AccountController extends Controller
                 $image->cover(150, 150);
                 $image->toPng()->save(public_path('/profile_pic/thumb/'. $imageName));
 
-
-
+                //Delete old Profile Pic//
+                File::delete(public_path('/profile_pic/thumb/'.Auth::user()->image));
+                File::delete(public_path('/profile_pic/'.Auth::user()->image));
 
 
             User::where('id', $id)->update(['image' => $imageName]);
