@@ -12,6 +12,10 @@
     <link rel="stylesheet" type="text/css" href=" {{ asset('assets/css/style.css') }}" />
 	<!-- Fav Icon -->
 	<link rel="shortcut icon" type="image/x-icon" href="#" />
+	<!-- Add this to your <head> -->
+
+	
+
 </head>
 <body data-instant-intensity="mousedown">
 <header>
@@ -37,7 +41,7 @@
 
 					@endif
 				
-				<a class="btn btn-primary" href="post-job.html" type="submit">Post a Job</a>
+				<a class="btn btn-primary" href="{{ route('account.createJob') }}" type="submit">Post a Job</a>
 			</div>
 		</div>
 	</nav>
