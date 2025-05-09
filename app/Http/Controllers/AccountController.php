@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\JobType;
+use App\Models\SavedJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -364,5 +365,38 @@ class AccountController extends Controller
                 'status' => true
             ]);
         }
+
+        public function savedJobs(){
+            $savedJobs = SavedJob::where('user_id',Auth::user()->id)->with(['job','job.jobType','job.applications'])
+            ->orderBy('created_at','DESC')
+            ->paginate(10);
+            return view('front.account.job.saved-jobs',[
+                'savedJobs' => $savedJobs
+            ]);
+        }
+
+        public function removesavedJobs(Request $request){
+
+
+            $SavedJob = SavedJob::where([
+                'id' => $request->id,
+                'user_id' => Auth::user()->id
+            ])->first();
+        
+            if ($SavedJob == null) {
+                session()->flash('error','Saved Job not found');
+                return response()->json([
+                    'status' => false,
+                ]);
+            }
+        
+            SavedJob::find($request->id)->delete();
+            session()->flash('success','Saved Job Removed successfully.');
+            return response()->json([
+                'status' => true
+            ]);
+        }
+        
+
 
 }

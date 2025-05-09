@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\JobType;
+use App\Models\SavedJob;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -73,7 +74,14 @@ class JobsController extends Controller
                                         if($job == null){
                                             abort(404);
                                         }
-                                        return view('front.jobDetail',['job' => $job]);
+                                        $count = 0;
+                                        if(Auth::user()){
+                                                $count = SavedJob::where([
+                                                    'user_id' => Auth::user()->id,
+                                                    'job_id' => $id
+                                                ])->count();
+                                        }
+                                        return view('front.jobDetail',['job' => $job, 'count' => $count]);
                                           }
 
 
@@ -144,6 +152,49 @@ class JobsController extends Controller
                                           }
 
 
+
+                                          public function saveJob(Request $request){
+
+                                            $id = $request->id;
+                                            $job = Job::find($id);
+
+                                            if($job == null){
+                                                $message = 'Job not Found.';
+                                                session()->flash('error',$message);
+                                                
+                                                return response()->json([
+                                                    'status' => false
+                                                ]);
+                                            }
+
+                                        //check if user already saved the job
+                                            $count = SavedJob::where([
+                                                'user_id' => Auth::user()->id,
+                                                'job_id' => $id
+                                            ])->count();
+    
+                                            if($count > 0){
+                                                session()->flash('error','You already saved this job.');
+                                                return response()->json([
+                                                    'status' => false,
+                                                    'message' => 'You already saved this job.'
+                                                ]);
+                                            }
+
+                                            $SavedJob = new SavedJob();
+                                            $SavedJob->job_id = $id;
+                                            $SavedJob->user_id = Auth::user()->id;
+                                            $SavedJob->save();
+    
+
+                                            $message = 'You have successfully Saved the job.';
+                                            session()->flash('success',$message);
+                                            
+                                            return response()->json([
+                                                'status' => true
+                                            ]);
+
+                                          }
                                         
 
 }
